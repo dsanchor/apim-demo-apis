@@ -2,6 +2,9 @@
     <inbound>
         <base />
         <set-backend-service base-url="https://conferenceapi.azurewebsites.net" />
+         <rate-limit calls="100" renewal-period="60" retry-after-variable-name="retryaftervar" remaining-calls-header-name="xrate-remainingcalls" remaining-calls-variable-name="remainingcallsvar" total-calls-header-name="xrate-totalcalls">
+            <operation name="GetSession" calls="5" renewal-period="60" />
+        </rate-limit>
     </inbound>
     <backend>
         <base />
