@@ -1,0 +1,146 @@
+version: 0.0.1
+apimServiceName: contoso-prod-apim
+#policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\globalServicePolicy.xml
+apiVersionSets:
+    - id: conferenceAPIv1
+      displayName: conferenceAPI
+      description: a sample public api
+      versioningScheme: Query
+      versionQueryName: version
+#      versionHeaderName: versionHeader
+#    - id: secondAPIVersionSetID
+#      displayName: secondSet
+#      description: another description
+#      versioningScheme: Header
+#      versionQueryName: versionQuery
+#      versionHeaderName: versionHeader
+apis:
+    - name: conferenceAPI
+      type: http
+      suffix: conferences
+      displayName: Conference API
+      description: A sample public api
+      serviceUrl: https://conferenceapi.azurewebsites.net
+      openApiSpec: TODO from blob
+      openApiSpecFormat: swagger
+#      policy: TODO from blob
+#      subscriptionRequired: true
+      isCurrent: true
+#      apiVersion: v1
+      apiVersionDescription: First api version
+      apiVersionSetId: conferenceAPIv1
+      apiRevision: 1
+      apiRevisionDescription: My first revision 
+ #     tags: Universe, myTag
+ #     operations:
+ #       addPet:
+ #         policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
+ #       deletePet:
+ #         policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\operationRateLimit.xml
+ #     products: starter, platinum
+ #     authenticationSettings:
+ #       oAuth2:
+#            authorizationServerId: myAuthServer
+#            scope: myScope
+#      diagnostic:
+#        name: applicationinsights
+#        alwaysLog: allErrors
+#        loggerId: myAppInsights
+#        sampling:
+#          samplingType: fixed
+#          percentage: 50
+#        frontend: 
+#          request:
+#            headers:
+#            body: 
+#              bytes: 512
+#          response: 
+#            headers:
+#            body: 
+#              bytes: 512
+#        backend: 
+#          request:
+#            headers:
+#            body: 
+#              bytes: 512
+#          response: 
+#            headers:
+#            body: 
+#              bytes: 512
+#        enableHttpCorrelationHeaders: true
+#products:
+#    - name: platinum
+#      displayName: Platinum
+#      description: a test product
+#      terms: some terms
+#      subscriptionRequired: true
+#      approvalRequired: true
+#      subscriptionsLimit: 1
+#      state: notPublished
+#      policy: C:\Users\myUsername\Projects\azure-api-management-devops-example\src\ArmTemplates\Creator\ExampleFiles\XMLPolicies\productSetBodyBasic.xml
+#      subscriptions:
+#          - name: platinum
+#            primaryKey: a240691f-03fd-4557-a5cb-6e0f65cd976a
+#            secondaryKey: 032338aa-0076-4379-910c-32ddd42f38a1
+#            state: active
+#            allowTracing: true 
+#tags:
+#    - displayName: Universe
+#loggers:
+#    - name: myAppInsights
+#      loggerType: applicationInsights
+#      description: a test app insights
+#      credentials:
+#        instrumentationKey: 45d4v88-fdfs-4b35-9232-731d82d4d1c6
+#      isBuffered: true
+#authorizationServers:
+#    - displayName: myAuthServer
+#      description: test server
+#      clientRegistrationEndpoint: https://www.contoso.com/apps
+#      authorizationEndpoint: https://www.contoso.com/oauth2/auth
+#      authorizationMethods:
+#        - GET
+#      tokenEndpoint: https://www.contoso.com/oauth2/token
+#      supportState: true
+#      defaultScope: read write
+#      grantTypes:
+#        - authorizationCode
+#        - implicit
+#      bearerTokenSendingMethods:
+#        - authorizationHeader
+#      clientId: 1
+#      clientSecret: 2
+#      resourceOwnerUsername: un
+#      resourceOwnerPassword: pwd
+#backends:
+#    - title: myBackend
+#      description: description5308
+#      url: https://backendname2644/
+#      protocol: http
+#      credentials:
+#        query: 
+#          sv: 
+#            - xx
+#            - bb
+#        header: 
+#          x-my-1:
+#            - val1
+#            - val2
+#        authorization: 
+#          scheme: Basic
+#          parameter: opensesma
+#      proxy:
+#        url: http://192.168.1.1:8080
+#        username: Contoso\admin
+#        password: opensesame
+#      tls:
+#        validateCertificateChain: false
+#        validateCertificateName: false
+outputLocation: tmpGeneratedTemplates
+linked: false
+#linkedTemplatesBaseUrl : https://mystorageaccount.blob.core.windows.net/mycontainer
+#linkedTemplatesUrlQueryString : ?sv=2018-03-28&ss=bfqt&srt=sco&sp=rwdlacup&se=2019-12-22T23:12:53Z&st=2019-09-09T14:12:53Z&spr=https&sig=uFTldJEYPH888QVzKb7q7eLq0Xt%2Bu35UTqpFGUYo6uc%3D
+baseFileName: conference-api
+#serviceUrlParameters: 
+#  - apiName: myAPI
+#    serviceUrl: httpbin.com/myAPI
