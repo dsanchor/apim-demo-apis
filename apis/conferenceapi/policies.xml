@@ -2,6 +2,12 @@
     <inbound>
         <base />
         <set-backend-service base-url="https://conferenceapi.azurewebsites.net" />
+        <trace source="CustomDemoTrace" severity="information">
+            <message>Inbound policy called</message>
+            <metadata name="IpAddress-Value" value="@((string)context.Request.IpAddress)" />
+            <metadata name="Url-Value" value="@((string)context.Request.Url.Path)" />
+            <metadata name="Authorization-Value" value="@(context.Request.Headers.GetValueOrDefault("Authorization", "No header found for Authorization"))" />
+        </trace>
          <rate-limit calls="100" renewal-period="60" retry-after-variable-name="retryaftervar" remaining-calls-header-name="xrate-remainingcalls" remaining-calls-variable-name="remainingcallsvar" total-calls-header-name="xrate-totalcalls">
             <operation name="GetSession" calls="5" renewal-period="60" />
         </rate-limit>
