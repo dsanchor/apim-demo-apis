@@ -17,6 +17,9 @@
     </backend>
     <outbound>
         <base />
+        <set-header name="traceparent" exists-action="skip">
+            <value>@(context.Request.Headers.GetValueOrDefault("traceparent", ""))</value>
+        </set-header>
     </outbound>
     <on-error>
         <base />
