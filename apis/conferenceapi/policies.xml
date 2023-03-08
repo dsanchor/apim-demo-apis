@@ -23,6 +23,19 @@
 
          <set-header name="X-AspNet-Version" exists-action="delete" />
          <set-header name="X-Powered-By" exists-action="delete" />
+
+        <choose>
+            <when condition="@(context.Response.StatusCode == 500)">
+                <return-response>
+                    <set-status code="550" reason="backend call error captured by APIM" />
+                    <set-header name="CustomHeader" exists-action="override">
+                        <value>Error captured and sanitized by APIM</value>
+                    </set-header>
+                    <set-body>Error captured and sanitized by APIM</set-body>
+                </return-response>
+            </when>
+        </choose>
+
     </outbound>
     <on-error>
         <base />
