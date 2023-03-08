@@ -119,6 +119,7 @@ APIM_SERVICE: Name of the APIM service instance
 
 SA: Name of the storage account created in previous step
 
+Open *policies.xml* file from *apis/conferenceapi2* folder and replace the string INSERT-AZURE-AAD-TENANT-GUID with the Azure Active Directory TenantId used when creating the App Registration 
 
 # Run the automation
 
@@ -133,3 +134,4 @@ git add .
 git commit -m "Initial commit"
 git push origin dev
 ```
+
