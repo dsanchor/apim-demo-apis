@@ -13,46 +13,11 @@ on:
 env:
   RG: contoso-${{ github.ref_name }}-rg
   APIM_SERVICE: contoso-${{ github.ref_name }}-apim-123
-  SA: contoso${{ github.ref_name }}apimsa
 
 jobs:
 
-  upload-api-descriptors:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Create container for API resources
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            for api in `ls apis`
-            do
-              az storage container create --name $api --account-name $SA  --public-access blob -g $RG
-            done
-
-      - name: Upload files for each API
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            for api in `ls apis`
-            do
-              for file in `ls apis/$api | egrep "openapi|policies"`
-              do
-                az storage blob upload --overwrite --container-name $api --account-name $SA --file apis/$api/$file
-              done
-            done
-
   generate-arm-templates:
     runs-on: ubuntu-latest
-    needs: upload-api-descriptors
-    
     steps:
       - uses: actions/checkout@v2
 
@@ -64,7 +29,8 @@ jobs:
                 cat apis/$api/apiconfig.yaml | \
                   API_NAME=$api \
                   APIM_SERVICE=$APIM_SERVICE \
-                  SA=$SA \
+                  REPO=${{ github.repository }} \
+                  BRANCH=${{ github.ref_name }} \
                   envsubst > apis/$api/apiconfig_resolved.yaml
               done
 
@@ -141,5 +107,4 @@ jobs:
             do
               echo "Deleting API $apiToRemove... not present in git anymore"
               az apim api delete -n $APIM_SERVICE -g $RG --api-id $apiToRemove -y
-              az storage container delete --name $apiToRemove --account-name $SA
             done

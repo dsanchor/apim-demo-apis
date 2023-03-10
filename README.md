@@ -14,7 +14,6 @@ This demo requires the following prerequisites:
 - The Azure CLI
 - A Service Principal with Contributor rights on the subscription
 - Setup credentials in Github Secrets
-- Create an storage account and a container for the temporary files used in deployment
 
 See next sections for instructions on how to set up these prerequisites.
 
@@ -82,50 +81,21 @@ We will create the following secrets in Github Secrets, where all values are the
 
 - AZURE_CREDENTIALS = <JSON_SP_FOR_GITHUB>
 
-### Storage account and container
 
-We will use a storage account and a container to store temporary data. You can create a storage account and a container with the following instructions:
-
-- Init the RESOURCE_GROUP variable with the name of the resource group you want to use:
-
-```bash
-export RESOURCE_GROUP=<resourcegroupname>
-```
-
-- Create the resource group:
-
-```bash
-az group create --name $RESOURCE_GROUP --location westeurope --subscription $SUBSCRIPTION_ID
-```
-
-- Init the STORAGE_ACCOUNT_NAME variable with the name of the storage account you want to use:
-
-```bash
-export STORAGE_ACCOUNT_NAME=<storageaccountname>
-```
-
-- Create the storage account:
-
-```bash
-az storage account create --name $STORAGE_ACCOUNT_NAME --resource-group $RESOURCE_GROUP --location westeurope --sku Standard_LRS --subscription $SUBSCRIPTION_ID
-```
-
-- Under *.github/workflows/* directory, find the *apis-deployment.yaml* file and modify the name of the variables:
-
-
-RG: Name of the resource group where storage account and apim service is located.
-
-APIM_SERVICE: Name of the APIM service instance
-
-SA: Name of the storage account created in previous step
-
-Open *policies.xml* file from *apis/conferenceapi2* folder and replace the string INSERT-AZURE-AAD-TENANT-GUID with the Azure Active Directory TenantId used when creating the App Registration 
 
 # Run the automation
 
 We have included a [GitHub Action](.github/workflows/apis-deployment.yaml) to run the apis deployment.
 
 This automation will register APIs inside APIM and its related policies.
+
+Before running the automation, under *.github/workflows/* directory, find the *apis-deployment.yaml* file and modify the name of the variables:
+
+- RG: Name of the resource group where the APIM service is located.
+
+- APIM_SERVICE: Name of the APIM service instance
+
+Open *policies.xml* file from *apis/conferenceapi2* folder and replace the string INSERT-AZURE-AAD-TENANT-GUID with the Azure Active Directory TenantId used when creating the App Registration 
 
 To run the automation, push the changes to the *dev* branch. The automation will run automatically.
 
