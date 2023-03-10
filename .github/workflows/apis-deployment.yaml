@@ -12,7 +12,7 @@ on:
 
 env:
   RG: contoso-${{ github.ref_name }}-rg
-  APIM_SERVICE: contoso-${{ github.ref_name }}-apim
+  APIM_SERVICE: contoso-${{ github.ref_name }}-apim-123
   SA: contoso${{ github.ref_name }}apimsa
 
 jobs:
