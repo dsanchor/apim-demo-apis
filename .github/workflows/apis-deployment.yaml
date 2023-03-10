@@ -1,0 +1,145 @@
+name: APIs deployment
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'apis/**'
+      - '.github/workflows/apis-deployment.yaml'
+  workflow_dispatch:
+
+env:
+  RG: contoso-${{ github.ref_name }}-rg
+  APIM_SERVICE: contoso-${{ github.ref_name }}-apim-123
+  SA: contoso${{ github.ref_name }}apimsa
+
+jobs:
+
+  upload-api-descriptors:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create container for API resources
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            for api in `ls apis`
+            do
+              az storage container create --name $api --account-name $SA  --public-access blob -g $RG
+            done
+
+      - name: Upload files for each API
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            for api in `ls apis`
+            do
+              for file in `ls apis/$api | egrep "openapi|policies"`
+              do
+                az storage blob upload --overwrite --container-name $api --account-name $SA --file apis/$api/$file
+              done
+            done
+
+  generate-arm-templates:
+    runs-on: ubuntu-latest
+    needs: upload-api-descriptors
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Generate apiconfig with variables
+        shell: bash
+        run: |
+              for api in `ls apis`
+              do
+                cat apis/$api/apiconfig.yaml | \
+                  API_NAME=$api \
+                  APIM_SERVICE=$APIM_SERVICE \
+                  SA=$SA \
+                  envsubst > apis/$api/apiconfig_resolved.yaml
+              done
+
+      - name: Generate templates for API
+        uses: addnab/docker-run-action@v3
+        with:
+            image: sancheski/arm-api-creator:0.0.1
+            options: -v ${{ github.workspace }}/apis:/app/apis
+            run: |
+                  for api in `ls /app/apis`
+                  do
+                    dotnet ArmTemplates.dll create --configFile /app/apis/$api/apiconfig_resolved.yaml
+                  done
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: apis
+          path: ${{ github.workspace }}/apis
+
+  provision-apis:
+    runs-on: ubuntu-latest
+    needs: generate-arm-templates
+
+    steps:
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: apis
+          path: apis
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Provision API
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            for api in `ls apis`
+            do
+              az deployment group create --resource-group $RG --template-file  apis/$api/generatedtemplates/$api.api.template.json --parameters @apis/$api/generatedtemplates/$api-parameters.json
+            done
+
+  delete-apis:
+    runs-on: ubuntu-latest
+    needs: provision-apis
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Delete API
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            ls apis > mustremain.list
+            echo "Must remain in APIM"
+            cat mustremain.list
+            echo ""
+            az apim api list --service-name $APIM_SERVICE --resource-group $RG \
+               -o tsv --query "[].{name:name}" > currentinapim.list
+            echo "Currently in APIM"
+            cat currentinapim.list
+
+            for apiToRemove in `diff mustremain.list currentinapim.list \
+                                  | grep -v "+++" | grep -v "\-\-\-" | grep -v "@@" \
+                                  | grep + | awk -F+ '{print $2}'`
+            do
+              echo "Deleting API $apiToRemove... not present in git anymore"
+              az apim api delete -n $APIM_SERVICE -g $RG --api-id $apiToRemove -y
+              az storage container delete --name $apiToRemove --account-name $SA
+            done

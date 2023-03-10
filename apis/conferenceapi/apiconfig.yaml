@@ -1,0 +1,18 @@
+version: 0.0.1
+apimServiceName: ${APIM_SERVICE}
+apis:
+    - name: ${API_NAME}
+      type: http
+      suffix: conferences
+      displayName: Conference API
+      openApiSpec: https://${SA}.blob.core.windows.net/${API_NAME}/openapi.json
+      openApiSpecFormat: swagger
+      policy: https://${SA}.blob.core.windows.net/${API_NAME}/policies.xml
+      isCurrent: true
+outputLocation: /app/apis/${API_NAME}/generatedtemplates
+linked: false
+baseFileName: ${API_NAME}
+serviceUrlParameters: 
+  - apiName: ${API_NAME}
+    serviceUrl: https://conferenceapi.azurewebsites.net
+
