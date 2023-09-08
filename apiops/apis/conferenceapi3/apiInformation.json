@@ -1,0 +1,19 @@
+{
+  "properties": {
+    "apiRevision": "1",
+    "apiVersionSetId": "",
+    "authenticationSettings": {},
+    "description": "",
+    "displayName": "Conference API 3",
+    "isCurrent": true,
+    "path": "conferences3",
+    "protocols": [
+      "https"
+    ],
+    "subscriptionKeyParameterNames": {
+      "header": "Ocp-Apim-Subscription-Key",
+      "query": "subscription-key"
+    },
+    "subscriptionRequired": true
+  }
+}
